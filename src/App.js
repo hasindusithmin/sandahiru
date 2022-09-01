@@ -23,10 +23,14 @@ function App() {
         verify()
     }
   },[])
-
+  const LogOut = async() => {
+    Cookies.remove('token')
+    await supabase.auth.signOut()
+    window.location.reload()
+  }
   return (
     <>
-      {auth ? <Dashboard />:<Login />}
+      {auth ? <Dashboard logout={LogOut} email={email}/>:<Login />}
     </>
   );
 }
