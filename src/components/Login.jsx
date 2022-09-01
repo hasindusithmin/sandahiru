@@ -2,7 +2,6 @@
 import React from "react"
 import { useState } from "react"
 import supabase from "../supabase"
-import jwt from "jsonwebtoken"
 import Cookie from 'js-cookie'
 
 export default function Login() {
@@ -13,15 +12,11 @@ export default function Login() {
     const signIn = async(e) => {
         e.preventDefault()
         document.getElementById('error').innerText = ''
-        const {user,error} = await supabase.auth.signIn({email,password})
+        const {session,error} = await supabase.auth.signIn({email,password})
         if (error) document.getElementById('error').innerText = error.message
         else {
-            const {id,email} = user;
-            //Sign JWT
-            const token = jwt.sign({id},process.env.REACT_APP_JWT,{expiresIn:3600})
-            // Set Cookie 
-            Cookie.set('token',token,{expires:1})
-            // Reload 
+            const {access_token} = session;
+            Cookie.set('token',access_token,{expires:1})
             window.location.reload()
         }
     }
