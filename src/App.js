@@ -1,11 +1,13 @@
 import React from 'react';
 import './App.css';
 import Login from "./components/Login"
-import {useEffect} from "react"
+import Dashboard from './components/Dashboard';
+import {useEffect,useState} from "react"
 import supabase from './supabase';
 import Cookies from 'js-cookie';
 function App() {
-
+  const [email,setEmail] = useState('')
+  const [auth,setAuth] = useState(false)
   useEffect(()=>{
     const token = Cookies.get('token')
     if (token !== undefined) {
@@ -14,7 +16,8 @@ function App() {
           if (error) alert(error.message)
           else {
             const {email} = user;
-            console.log(email);
+            setEmail(email)
+            setAuth(true)
           }
         }
         verify()
@@ -22,7 +25,9 @@ function App() {
   },[])
 
   return (
-    <Login />
+    <>
+      {auth ? <Dashboard />:<Login />}
+    </>
   );
 }
 
