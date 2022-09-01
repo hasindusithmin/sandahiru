@@ -1,14 +1,29 @@
 
 import React from "react"
 import { useState } from "react"
+import supabase from "../supabase"
+import jwt from "jsonwebtoken"
+import Cookie from 'js-cookie'
+
 export default function Login() {
 
     const [email,setEmail] = useState('')
     const [password,setPassword] = useState('')
 
-    const signIn = e => {
+    const signIn = async(e) => {
         e.preventDefault()
-        console.log({email,password});
+        document.getElementById('error').innerText = ''
+        const {user,error} = await supabase.auth.signIn({email,password})
+        if (error) document.getElementById('error').innerText = error.message
+        else {
+            const {id,email} = user;
+            //Sign JWT
+            const token = jwt.sign({id},process.env.REACT_APP_JWT,{expiresIn:3600})
+            // Set Cookie 
+            Cookie.set('token',token,{expires:1})
+            // Reload 
+            window.location.reload()
+        }
     }
 
     return (
@@ -27,6 +42,7 @@ export default function Login() {
                                 <i className="fa fa-envelope fa-fw w3-hover-text-black w3-xlarge w3-margin-right"></i> Web: <a href="https://sanda-hiru-rice-mills.business.site/">Link</a><br/>
                                 </div>
                                 <p>Already have an account?</p>
+                                <p id="error" className="w3-text-red"></p>
                                 <form target="_blank" autoComplete="off" onSubmit={signIn}>
                                     <div className="w3-row-padding" style={{margin:'0 -16px 8px -16px'}}>
                                         <div className="w3-half">
